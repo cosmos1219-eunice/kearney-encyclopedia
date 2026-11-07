@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kearney 백과사전</title>
+<style>
+:root{
+  --aqua:#1f6fe0; --aqua-hi:#8fc4ff; --aqua-lo:#0b4fb8;
+  --stripe-a:#ffffff; --stripe-b:#eef0f3;
+  --chrome-hi:#f4f4f4; --chrome-lo:#c6c6c6;
+  --text:#1b1b1b; --muted:#5c6370; --line:#b9bec7;
+  --source:#e3e9f2; --source-sel-hi:#6fa8f0; --source-sel-lo:#2e6fd0;
+  --paper:#ffffff;
+  --font:"Lucida Grande","Lucida Sans Unicode","Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
+}
+:root[data-theme="graphite"]{
+  --aqua:#6e7884; --aqua-hi:#c9d0d8; --aqua-lo:#4a525c;
+  --source-sel-hi:#a3acb7; --source-sel-lo:#66707c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; font-family:var(--font); color:var(--text); font-size:15px; line-height:1.7;
+  background:#2a6fd6;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,255,255,.35), transparent 60%),
+    radial-gradient(ellipse 70% 90% at 90% 100%, #0a3a8c 0%, transparent 60%),
+    conic-gradient(from 210deg at 60% 40%, #1d5fd0, #4aa3ff, #1a4fb5, #6cc0ff, #1d5fd0);
+  background-attachment:fixed;
+  min-height:100vh; padding:28px 28px 120px;
+}
+:root[data-theme="graphite"] body{
+  background:radial-gradient(ellipse at 30% 20%, #8d96a1, #3b4149 70%); background-attachment:fixed;
+}
+
+/* ---------- menubar ---------- */
+.menubar{
+  position:fixed; inset:0 0 auto 0; height:22px; z-index:50;
+  background:linear-gradient(#fdfdfd,#e2e2e2); border-bottom:1px solid #a0a0a0;
+  display:flex; align-items:center; gap:18px; padding:0 14px; font-size:13px;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+}
+.menubar .apple{font-size:15px; color:var(--aqua)}
+.menubar b{font-weight:700}
+.menubar .spacer{flex:1}
+.menubar .clock{color:#333}
+
+/* ---------- window ---------- */
+.window{
+  max-width:1240px; margin:16px auto 0; border-radius:9px 9px 6px 6px; overflow:clip;
+  box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(0,0,0,.35);
+  background:repeating-linear-gradient(0deg,var(--stripe-a) 0 2px,var(--stripe-b) 2px 4px);
+}
+.titlebar{
+  height:56px; display:flex; align-items:center; gap:14px; padding:0 14px;
+  background:linear-gradient(#ececec 0%,#d6d6d6 50%,#c8c8c8 51%,#d9d9d9 100%);
+  border-bottom:1px solid #8e8e8e; position:sticky; top:22px; z-index:40;
+}
+.lights{display:flex; gap:8px}
+.light{
+  width:14px; height:14px; border-radius:50%; border:1px solid rgba(0,0,0,.35); cursor:pointer; position:relative; padding:0;
+  box-shadow:inset 0 -3px 4px rgba(255,255,255,.6), inset 0 2px 2px rgba(0,0,0,.25);
+}
+.light::after{content:""; position:absolute; left:3px; top:1px; width:6px; height:4px; border-radius:50%; background:rgba(255,255,255,.85)}
+.light.red{background:radial-gradient(circle at 50% 70%,#ff8a7a,#d8301d 70%)}
+.light.yellow{background:radial-gradient(circle at 50% 70%,#ffe48a,#d99a0e 70%)}
+.light.green{background:radial-gradient(circle at 50% 70%,#a8f07c,#3e9b17 70%)}
+:root[data-theme="graphite"] .light{background:radial-gradient(circle at 50% 70%,#d3d8de,#7c8590 70%)}
+.wtitle{flex:1; text-align:center; font-size:13px; color:#333; text-shadow:0 1px 0 #fff; font-weight:600}
+.toolbar{display:flex; gap:8px; align-items:center}
+
+/* aqua gel button */
+.gel{
+  font:inherit; font-size:12px; color:#fff; border:1px solid var(--aqua-lo); border-radius:999px; padding:4px 14px; cursor:pointer;
+  background:linear-gradient(var(--aqua-hi) 0%, var(--aqua) 50%, var(--aqua-lo) 51%, var(--aqua) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7), 0 1px 2px rgba(0,0,0,.35);
+  text-shadow:0 -1px 0 rgba(0,0,0,.35); position:relative; overflow:hidden;
+}
+.gel::before{content:""; position:absolute; left:8%; right:8%; top:1px; height:45%; border-radius:999px; background:linear-gradient(rgba(255,255,255,.85),rgba(255,255,255,.1))}
+.gel.white{color:#222; text-shadow:0 1px 0 #fff; border-color:#8a8a8a; background:linear-gradient(#fff 0%,#f0f0f0 50%,#dcdcdc 51%,#f2f2f2 100%)}
+.gel:active{filter:brightness(.85)}
+.search{
+  font:inherit; font-size:12px; width:200px; padding:4px 12px 4px 26px; border-radius:999px; border:1px solid #8a8a8a;
+  box-shadow:inset 0 2px 3px rgba(0,0,0,.25); outline:none; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Ccircle cx='6' cy='6' r='4.5' fill='none' stroke='%23666' stroke-width='1.6'/%3E%3Cpath d='M9.5 9.5l3.5 3.5' stroke='%23666' stroke-width='1.8'/%3E%3C/svg%3E") 8px 50% no-repeat;
+}
+.search:focus{box-shadow:inset 0 2px 3px rgba(0,0,0,.25), 0 0 0 3px rgba(80,150,255,.55)}
+
+/* progress (barber pole) */
+.progress{height:6px; background:#d7d7d7; border-bottom:1px solid #9a9a9a; position:sticky; top:78px; z-index:39}
+.progress i{
+  display:block; height:100%; width:0; border-radius:0 3px 3px 0;
+  background:repeating-linear-gradient(-45deg,var(--aqua) 0 8px,var(--aqua-hi) 8px 16px);
+  background-size:22px 22px; animation:pole 1s linear infinite;
+}
+@keyframes pole{to{background-position:22px 0}}
+
+/* ---------- layout ---------- */
+.body{display:grid; grid-template-columns:240px 1fr; min-height:70vh}
+.window.no-side .body{grid-template-columns:0 1fr}
+.window.no-side .sidebar{display:none}
+.sidebar{
+  background:var(--source); border-right:1px solid var(--line); padding:14px 0; position:sticky; top:84px; align-self:start;
+  max-height:calc(100vh - 110px); overflow:auto;
+}
+.sidebar h6{margin:6px 16px 6px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6b7686}
+.sidebar a{
+  display:flex; gap:8px; align-items:center; padding:5px 16px; font-size:13px; color:var(--text); text-decoration:none; border-top:1px solid transparent; border-bottom:1px solid transparent;
+}
+.sidebar a:hover{background:rgba(255,255,255,.55)}
+.sidebar a.active{color:#fff; background:linear-gradient(var(--source-sel-hi),var(--source-sel-lo)); border-color:var(--source-sel-lo); text-shadow:0 -1px 0 rgba(0,0,0,.3); font-weight:600}
+.sidebar .count{margin-left:auto; font-size:11px; background:#8b97a8; color:#fff; border-radius:999px; padding:0 7px}
+.sidebar a.active .count{background:rgba(255,255,255,.35)}
+
+.content{background:var(--paper); padding:34px clamp(18px,4vw,56px) 60px; min-width:0}
+.hero{
+  border-radius:12px; padding:28px 30px; margin-bottom:34px; color:#fff; position:relative; overflow:hidden;
+  background:linear-gradient(160deg,var(--aqua-hi) 0%,var(--aqua) 45%,var(--aqua-lo) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 18px rgba(0,60,160,.3);
+}
+.hero::before{content:""; position:absolute; left:3%; right:3%; top:4px; height:46%; border-radius:12px 12px 50% 50%/12px 12px 30px 30px; background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,0))}
+.hero h1{margin:0; font-size:clamp(26px,4vw,38px); letter-spacing:-.01em; position:relative; text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.hero p{margin:6px 0 0; position:relative; opacity:.95}
+.hero .stats{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; position:relative}
+.hero .stats span{background:rgba(255,255,255,.22); border:1px solid rgba(255,255,255,.45); border-radius:999px; padding:2px 12px; font-size:12px}
+
+/* ---------- article ---------- */
+.article{scroll-margin-top:100px; padding-bottom:28px; margin-bottom:34px; border-bottom:1px dashed #c9ced6}
+.article.hidden{display:none}
+.article h2{
+  font-size:24px; margin:0 0 10px; padding:6px 14px; border-radius:6px; color:#14325f;
+  background:linear-gradient(#f7faff,#dfe9f7); border:1px solid #b6c6de; box-shadow:inset 0 1px 0 #fff;
+}
+.article h2 .ico{margin-right:8px}
+.article h3{font-size:18px; color:#1a3d73; margin:26px 0 8px; padding-bottom:4px; border-bottom:2px solid #d5e2f4}
+.article h4{font-size:15px; margin:0 0 4px; color:#1c2a3d}
+.lead{font-size:16px; color:#30394a; background:#f3f7fc; border-left:4px solid var(--aqua); padding:10px 14px; border-radius:0 6px 6px 0}
+.article a{color:var(--aqua-lo)}
+blockquote{margin:14px 0; padding:10px 16px; border-left:4px solid var(--aqua-hi); background:#f6f8fb; color:#384152; font-style:italic; border-radius:0 6px 6px 0}
+
+.infobox{float:right; width:300px; margin:0 0 16px 22px; border:1px solid #9fb0c8; border-radius:8px; overflow:hidden; background:#f8fafd; box-shadow:0 2px 6px rgba(0,0,0,.12); font-size:13px}
+.infobox-title{color:#fff; text-align:center; font-weight:700; padding:7px; background:linear-gradient(var(--aqua-hi),var(--aqua) 50%,var(--aqua-lo) 51%,var(--aqua)); text-shadow:0 -1px 0 rgba(0,0,0,.3)}
+.infobox table{width:100%; border-collapse:collapse}
+.infobox th,.infobox td{padding:6px 10px; border-top:1px solid #dfe5ee; vertical-align:top; text-align:left}
+.infobox th{width:38%; color:#455369; background:#eef3f9; font-weight:600}
+
+table.aqua-table{width:100%; border-collapse:separate; border-spacing:0; margin:12px 0 18px; font-size:13.5px; border:1px solid #a9b4c4; border-radius:6px; overflow:hidden}
+.aqua-table th{background:linear-gradient(#fbfbfb,#dedede); border-bottom:1px solid #a9b4c4; text-align:left; padding:6px 10px; font-weight:600}
+.aqua-table td{padding:6px 10px; border-top:1px solid #e3e7ec; vertical-align:top}
+.aqua-table tbody tr:nth-child(even) td{background:#edf3fe}
+.aqua-table tbody tr:hover td{background:#d8e7ff}
+
+.timeline{position:relative; margin:18px 0; padding-left:28px}
+.timeline::before{content:""; position:absolute; left:9px; top:4px; bottom:4px; width:4px; border-radius:2px; background:linear-gradient(var(--aqua-hi),var(--aqua-lo))}
+.tl-item{position:relative; margin-bottom:16px}
+.tl-item::before{content:""; position:absolute; left:-25px; top:6px; width:14px; height:14px; border-radius:50%; background:radial-gradient(circle at 40% 30%,#fff,var(--aqua-hi) 30%,var(--aqua) 70%); border:1px solid var(--aqua-lo)}
+.tl-year{display:inline-block; font-size:12px; font-weight:700; color:#fff; padding:1px 10px; border-radius:999px; background:linear-gradient(var(--aqua-hi),var(--aqua) 50%,var(--aqua-lo) 51%,var(--aqua))}
+.tl-body{background:#fff; border:1px solid #d3dbe6; border-radius:8px; padding:8px 12px; margin-top:4px; box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.tl-body p{margin:2px 0 0}
+
+.card-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin:14px 0}
+.card{
+  border:1px solid #b8c4d6; border-radius:10px; padding:12px 14px; transition:transform .15s, box-shadow .15s;
+  background:linear-gradient(#ffffff,#eef3fa); box-shadow:inset 0 1px 0 #fff, 0 1px 3px rgba(0,0,0,.1);
+}
+.card:hover{transform:translateY(-2px); box-shadow:0 6px 14px rgba(20,70,160,.18)}
+.card p{margin:0; font-size:13.5px; color:#3a4456}
+.callout{margin:14px 0; padding:10px 14px 10px 40px; border-radius:8px; border:1px solid #e3c560; background:#fff8dc; position:relative; font-size:14px}
+.callout::before{content:"i"; position:absolute; left:12px; top:10px; width:18px; height:18px; border-radius:50%; text-align:center; font:700 12px/18px Georgia,serif; color:#fff; background:radial-gradient(circle at 40% 30%,#ffd76a,#d39500)}
+.badge{display:inline-block; font-size:11px; padding:0 8px; border-radius:999px; color:#fff; background:linear-gradient(var(--aqua-hi),var(--aqua) 50%,var(--aqua-lo) 51%); vertical-align:middle}
+details.faq{border:1px solid #c3ccd9; border-radius:8px; margin:8px 0; background:#fafcff}
+details.faq summary{cursor:pointer; padding:8px 12px; font-weight:600; list-style:none}
+details.faq summary::before{content:"▶"; display:inline-block; margin-right:8px; color:var(--aqua); transition:transform .15s; font-size:11px}
+details.faq[open] summary::before{transform:rotate(90deg)}
+details.faq p{margin:0; padding:0 14px 10px 32px}
+mark{background:#ffe66b; padding:0 2px; border-radius:2px}
+.empty{display:none; text-align:center; color:var(--muted); padding:40px}
+.footer{font-size:12px; color:var(--muted); text-align:center; padding:18px; border-top:1px solid #ddd; background:#f6f6f6}
+
+/* ---------- dock ---------- */
+.dock{
+  position:fixed; left:50%; bottom:10px; transform:translateX(-50%); z-index:60;
+  display:flex; align-items:flex-end; gap:6px; padding:6px 12px 8px; height:72px;
+  background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,.25)); border:1px solid rgba(255,255,255,.7);
+  border-radius:14px; backdrop-filter:blur(8px); box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.dock a{
+  width:48px; height:48px; border-radius:12px; display:grid; place-items:center; font-size:26px; text-decoration:none; position:relative;
+  background:linear-gradient(#ffffff,#d9e6f8); border:1px solid rgba(0,0,0,.2); box-shadow:inset 0 1px 0 #fff, 0 2px 4px rgba(0,0,0,.25);
+  transition:width .15s, height .15s, margin .15s;
+}
+.dock a:hover{width:64px; height:64px; margin-top:-16px}
+.dock a::after{content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); white-space:nowrap; font-size:12px; color:#fff; background:rgba(0,0,0,.75); padding:2px 9px; border-radius:6px; opacity:0; pointer-events:none; transition:opacity .15s}
+.dock a:hover::after{opacity:1}
+.dock{scrollbar-width:none}
+.dock::-webkit-scrollbar{display:none}
+
+/* scrollbar (aqua) */
+::-webkit-scrollbar{width:15px; height:15px}
+::-webkit-scrollbar-track{background:repeating-linear-gradient(90deg,#e8e8e8 0 2px,#f6f6f6 2px 4px); box-shadow:inset 1px 0 2px rgba(0,0,0,.2)}
+::-webkit-scrollbar-thumb{border-radius:8px; border:2px solid transparent; background-clip:padding-box; background-color:var(--aqua);
+  background-image:linear-gradient(90deg,var(--aqua-lo),var(--aqua-hi) 40%,var(--aqua) 60%,var(--aqua-lo))}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  body{padding:22px 0 110px}
+  .window{border-radius:0; margin-top:0}
+  .body{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .window.show-side .sidebar{display:block; position:fixed; top:84px; left:0; bottom:0; width:240px; z-index:45; max-height:none; box-shadow:4px 0 16px rgba(0,0,0,.3)}
+  .infobox{float:none; width:auto; margin:0 0 16px}
+  .search{width:130px}
+  .wtitle{display:none}
+  .toolbar .gel.white{display:none}
+  .dock{gap:3px; padding:6px 8px; height:62px; max-width:calc(100vw - 16px); overflow-x:auto}
+  .dock a{width:38px; height:38px; font-size:20px; flex:none}
+  .dock a:hover{width:38px; height:38px; margin-top:0}
+  .menubar .hide-m{display:none}
+}
+@media print{.menubar,.dock,.titlebar,.progress,.sidebar{display:none!important} body{background:none;padding:0} .window{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="menubar">
+  <span class="apple">●</span><b>백과사전</b><span class="hide-m">파일</span><span class="hide-m">편집</span><span class="hide-m">보기</span><span class="hide-m">윈도우</span><span class="hide-m">도움말</span>
+  <span class="spacer"></span><span class="clock" id="clock"></span>
+</div>
+
+<div class="window" id="win">
+  <div class="titlebar">
+    <div class="lights">
+      <button class="light red" title="맨 위로" id="btnTop" aria-label="맨 위로"></button>
+      <button class="light yellow" title="사이드바 접기" id="btnSide" aria-label="사이드바 접기"></button>
+      <button class="light green" title="테마 전환 (Aqua / Graphite)" id="btnTheme" aria-label="테마 전환"></button>
+    </div>
+    <div class="wtitle">Kearney 백과사전 — Encyclopedia</div>
+    <div class="toolbar">
+      <button class="gel white" id="btnExpand">FAQ 모두 펼치기</button>
+      <button class="gel" id="btnRandom">무작위 항목</button>
+      <input class="search" id="q" type="search" placeholder="검색">
+    </div>
+  </div>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="body">
+    <nav class="sidebar" id="side"><h6>목차</h6></nav>
+    <main class="content" id="content">
+      <header class="hero">
+        <h1>Kearney 백과사전</h1>
+        <p>글로벌 경영 컨설팅 기업 커니(Kearney, 구 A.T. Kearney)의 역사·서비스·리서치·사람·한국 활동, 그리고 같은 이름의 다른 뜻을 정리했습니다.</p>
+        <div class="stats" id="stats"></div>
+      </header>
+<section class="article" id="overview" data-title="개요" data-icon="🏛️">
+<h2>개요</h2>
+<p class="lead"><strong>커니(Kearney)</strong>는 미국 일리노이주 시카고(Chicago)에 본사를 둔 글로벌 경영 컨설팅 회사다. 1926년 시카고에서 출발한 맥킨지 앤드 컴퍼니(McKinsey &amp; Company)의 초기 파트너였던 앤드루 토머스 커니(Andrew Thomas Kearney)의 이름을 따왔으며, 오랫동안 <strong>A.T. 커니(A.T. Kearney)</strong>라는 이름으로 알려졌다가 2020년 리브랜딩을 거쳐 현재의 ‘Kearney’로 이름을 바꾸었다. 약 40여 개국에 사무소를 두고 약 5,000~6,000명 규모의 인력을 운영하며, 외부 자본 없이 파트너들이 소유하는 파트너십 구조를 유지하고 있다.</p>
+
+<aside class="infobox">
+<div class="infobox-title">커니 (Kearney)</div>
+<table>
+<tr><th>옛 이름</th><td>McKinsey, Kearney &amp; Co. → A.T. Kearney &amp; Company → A.T. Kearney</td></tr>
+<tr><th>유형</th><td>비상장 파트너십 (파트너 소유)</td></tr>
+<tr><th>업종</th><td>경영 컨설팅</td></tr>
+<tr><th>설립</th><td>1926년, 미국 시카고 (회사 기준 연원)</td></tr>
+<tr><th>설립자·이름의 유래</th><td>앤드루 토머스 커니 (Andrew Thomas Kearney, 1892–1962)</td></tr>
+<tr><th>본사</th><td>미국 일리노이주 시카고</td></tr>
+<tr><th>진출 국가</th><td>약 40여 개국</td></tr>
+<tr><th>임직원 수</th><td>약 5,300~5,700명 (출처별 상이)</td></tr>
+<tr><th>글로벌 매니징 파트너</th><td>밥 윌런 (Bob Willen, 2024년~)</td></tr>
+<tr><th>주요 지수·보고서</th><td>FDI 신뢰지수, 글로벌 도시 지수(Global Cities Index) 등</td></tr>
+<tr><th>웹사이트</th><td>kearney.com</td></tr>
+</table>
+</aside>
+
+<h3>정의와 성격</h3>
+<p>커니는 기업과 정부, 공공기관을 대상으로 전략 수립, 운영 효율화, 조달·구매(procurement), 공급망 관리, 디지털 전환, 조직 변화 관리 등 폭넓은 경영 자문 서비스를 제공한다. 흔히 ‘전략 컨설팅 회사’로 분류되지만, 역사적으로 생산·운영 현장에 대한 실무형 컨설팅에 강점을 쌓아 왔다는 점이 특징이다. 특히 조달과 구매 분야는 커니를 대표하는 영역으로 꼽히며, 이 분야에서 축적한 방법론과 연구 성과는 업계에서 자주 인용된다. 제공 서비스의 상세한 구성은 <a href="#services">서비스와 산업</a> 항목에서 다룬다.</p>
+
+<h3>본사와 글로벌 네트워크</h3>
+<p>본사는 회사가 탄생한 도시인 시카고에 있다. 이는 1939년 맥킨지에서 분리될 당시 커니가 시카고 사무소를 이어받은 데서 비롯된 것으로, 뉴욕을 거점으로 한 맥킨지 앤드 컴퍼니와 대비되는 대목이기도 하다. 제2차 세계대전 이후 유럽과 아시아로 진출하면서 국제적 네트워크를 갖추었고, 오늘날에는 북미·유럽·중동·아시아태평양·중남미 등 다섯 개 대륙에 걸쳐 약 40여 개국에서 사무소를 운영한다. 한국에도 서울 사무소가 있으며, 이에 관해서는 <a href="#korea">한국과 커니</a> 항목을 참고할 수 있다.</p>
+
+<h3>규모</h3>
+<p>커니는 비상장 회사이므로 매출 등 재무 정보를 정기적으로 공개할 의무가 없고, 외부에 알려진 수치도 출처마다 차이가 있다. 공개 자료에 따르면 임직원 수는 약 5,300명에서 약 5,700명 수준으로 집계되며, 진출 국가는 약 40여 개국이다. 이러한 규모는 맥킨지, 보스턴 컨설팅 그룹, 베인 앤드 컴퍼니 등 이른바 ‘MBB’보다는 작지만, 전략 컨설팅 업계에서는 상위권에 속하는 글로벌 회사로 평가된다.</p>
+
+<h3>소유 구조</h3>
+<p>커니의 현재 소유 구조는 <strong>파트너 소유(partner-owned)</strong>다. 1995년 미국의 IT 서비스 기업 EDS(Electronic Data Systems)에 인수되어 약 10년간 대기업의 자회사로 운영되었으나, 2006년 초 파트너들이 경영자 인수(MBO, management buyout)를 통해 회사를 되사들이면서 독립 파트너십으로 돌아왔다. 이후 커니는 외부 주주의 영향을 받지 않는 독립성을 회사 정체성의 핵심 요소로 내세우고 있으며, 글로벌 매니징 파트너(Global Managing Partner)는 파트너들의 선출로 정해진다. 2024년에는 2018년부터 두 차례 임기를 지낸 알렉스 리우(Alex Liu)의 뒤를 이어 밥 윌런(Bob Willen)이 글로벌 매니징 파트너로 선출되었다. 주요 인물에 관해서는 <a href="#people">주요 인물</a> 항목에서 자세히 다룬다.</p>
+
+<h3>업계 내 위치</h3>
+<p>컨설팅 업계에서는 맥킨지 앤드 컴퍼니(McKinsey &amp; Company), 보스턴 컨설팅 그룹(BCG), 베인 앤드 컴퍼니(Bain &amp; Company)를 묶어 ‘MBB’ 또는 ‘빅3’라 부르는 관행이 있다. 커니는 이들 MBB의 바로 다음 그룹, 즉 이른바 ‘티어 2’ 혹은 ‘준(準)MBB’ 전략 컨설팅 회사로 분류되는 경우가 많다. 다만 이러한 서열은 공식적인 기준이 아니라 업계 평판, 채용 시장, 각종 순위 조사 등에 근거한 관행적 구분이며, 산업이나 지역, 기능 영역에 따라 평가는 달라진다.</p>
+<div class="card-grid">
+<div class="card"><h4>공통의 뿌리</h4><p>커니와 맥킨지는 1926년 시카고에서 출발한 같은 회사에서 갈라져 나왔다. 이 때문에 커니는 스스로를 MBB 중 가장 오래된 맥킨지와 같은 연원을 가진 회사로 소개한다.</p></div>
+<div class="card"><h4>운영·조달의 강점</h4><p>전략 수립과 함께 운영 개선, 조달, 공급망 등 실행 중심 영역에서 강한 전문성을 가진 회사로 알려져 있다.</p></div>
+<div class="card"><h4>독립성</h4><p>EDS 산하 시기를 거친 뒤 파트너 소유로 복귀했으며, 이후 독립 파트너십 구조를 정체성으로 강조한다.</p></div>
+<div class="card"><h4>싱크탱크 활동</h4><p>글로벌 비즈니스 정책 위원회(Global Business Policy Council)를 통해 FDI 신뢰지수, 글로벌 도시 지수 등을 발표해 왔다. 자세한 내용은 <a href="#research">연구와 지수</a> 항목 참고.</p></div>
+</div>
+
+<h3>브랜드</h3>
+<p>회사는 1947년 A.T. 커니 앤드 컴퍼니로 이름을 바꾼 뒤(1972년 ‘A.T. Kearney’로 단축) ‘A.T. 커니’라는 이름을 사용해 왔으며, 한국어로는 ‘에이티커니’ 또는 ‘AT커니’로 표기되는 경우가 많았다. 2020년 1월 회사는 이름에서 ‘A.T.’를 떼어내고 <span class="badge">Kearney</span>라는 간결한 이름과 새로운 시각 정체성(로고 등)을 도입했다. 회사 측은 이 리브랜딩을 창업 정신과 전통을 보존하면서 회사를 새롭게 하는 작업으로 설명했다. 이 때문에 2020년 이전 자료에는 ‘A.T. Kearney’, 이후 자료에는 ‘Kearney’라는 이름이 주로 쓰인다. 한국어로는 ‘커니’로 적는 것이 일반적이다.</p>
+<div class="callout">‘Kearney’라는 단어는 컨설팅 회사 외에도 미국 네브래스카주의 도시 커니, 미국 뉴저지주의 커니 등 여러 대상을 가리킨다. 동명의 다른 대상에 관해서는 <a href="#other-meanings">다른 뜻</a> 항목을 참고.</div>
+
+<h3>창립 100주년</h3>
+<p>커니는 1926년을 회사의 출발점으로 삼고 있으며, 이에 따라 2026년을 창립 100주년으로 기념하고 있다. 회사의 탄생에서 현재에 이르는 과정은 <a href="#history">역사</a> 항목에서 상세히 다룬다.</p>
+</section>
+
+<section class="article" id="history" data-title="역사" data-icon="📜">
+<h2>역사</h2>
+<p class="lead">커니의 역사는 1926년 시카고에서 제임스 O. 맥킨지(James O. McKinsey)가 세운 컨설팅 회사에서 시작된다. 1939년 맥킨지 사후의 분리를 거쳐 앤드루 토머스 커니가 시카고 사무소를 이끄는 독립 회사가 되었고, 1947년 ‘A.T. 커니 앤드 컴퍼니’라는 이름을 얻었다. 이후 전후 국제화, 1995년 EDS 인수, 2006년 파트너 경영자 인수(MBO), 2020년 ‘Kearney’ 리브랜딩을 거쳐 2026년 창립 100주년을 맞았다.</p>
+
+<h3>창업: 맥킨지의 시카고 회사 (1926~1937)</h3>
+<p>1926년 시카고 대학교의 회계학 교수였던 제임스 O. 맥킨지는 회계와 예산 기법을 경영 관리에 적용하는 자문 회사인 ‘제임스 O. 맥킨지 앤드 컴퍼니(James O. McKinsey &amp; Company)’를 시카고에 세웠다. 오늘날 커니는 이 해를 자사의 출발점으로 삼는다. 앤드루 토머스 커니(Andrew Thomas Kearney, 흔히 ‘톰 커니’)는 창업 몇 년 뒤인 1929년 무렵 회사에 합류해 맥킨지의 초기 파트너 가운데 한 사람이 되었으며, 실무 경영과 생산 현장에 밝은 컨설턴트로 이름을 얻었다.</p>
+<p>1930년대 초 회사는 뉴욕 등지로 확장했고, 1935년 무렵에는 회계 법인과의 합병을 거치는 등 조직이 복잡해졌다. 제임스 맥킨지는 한때 고객사였던 백화점 마셜 필드(Marshall Field &amp; Company)의 경영을 맡기도 했으나, 1937년 갑작스럽게 사망했다. 창업자를 잃은 회사 안에서는 시카고 측과 뉴욕 측 파트너들 사이에 경영 방향을 둘러싼 이견이 커졌다.</p>
+
+<h3>1939년의 분리</h3>
+<p>1939년 회사는 둘로 나뉘었다. 뉴욕 사무소는 마빈 바우어(Marvin Bower) 등이 이끄는 ‘맥킨지 앤드 컴퍼니(McKinsey &amp; Company)’로 독립했고, 시카고 사무소는 톰 커니가 이끄는 ‘맥킨지, 커니 앤드 컴퍼니(McKinsey, Kearney &amp; Co.)’로 운영되었다. 일부 자료는 이 분리가 뉴욕 측 파트너들의 제안으로 이루어졌다고 전한다. 두 회사는 한동안 ‘맥킨지’라는 이름을 함께 사용했다.</p>
+<blockquote>뉴욕의 맥킨지와 시카고의 커니가 같은 뿌리에서 갈라졌다는 사실은, 두 회사가 오늘날까지 서로 다른 성격의 컨설팅 회사로 발전한 출발점으로 자주 언급된다.</blockquote>
+
+<h3>A.T. 커니 앤드 컴퍼니의 탄생 (1940년대)</h3>
+<p>1947년, 바우어 측이 ‘맥킨지’라는 이름의 권리를 확보하면서 시카고 회사는 창업 파트너의 이름을 따 <strong>A.T. 커니 앤드 컴퍼니(A.T. Kearney &amp; Company)</strong>로 이름을 바꾸었다. 회사 공식 연혁은 이 개명 시점을 1947년으로 제시한다(일부 2차 자료는 1946년으로 적기도 한다). 회사 이름은 1972년 다시 ‘A.T. 커니(A.T. Kearney)’로 줄었다. 톰 커니는 이후 1962년 세상을 떠날 때까지 회사의 상징적 인물로 남았다. 그는 고객에 대한 헌신과 실질적 성과를 중시하는 원칙을 강조한 것으로 알려져 있으며, 이 정신은 오늘날 커니의 조직 문화를 설명할 때 자주 인용된다.</p>
+
+<h3>전후 국제화 (1960~1980년대)</h3>
+<p>제2차 세계대전 이후 미국 제조업의 성장과 함께 커니는 생산 관리, 운영 개선 분야에서 고객 기반을 넓혔다. 1960년대에는 유럽에 진출했는데, 첫 유럽 거점으로는 서독 뒤셀도르프(Düsseldorf) 사무소가 흔히 꼽힌다. 이후 런던, 파리, 밀라노 등 유럽 주요 도시로 네트워크가 확대되었다. 1970년대에는 일본 도쿄를 시작으로 아시아에 진출했고, 1980년대 이후 아시아태평양과 중남미 등지로 사무소를 넓혀 갔다. 이 시기 커니는 조달·구매, 공급망, 운영 분야의 전문성을 토대로 국제적 컨설팅 회사로 자리 잡았다.</p>
+
+<h3>싱크탱크 기능의 강화 (1990년대)</h3>
+<p>1990년대 커니는 고객 자문과 별도로 세계 경제·정책 환경을 분석하는 연구 활동을 강화했다. 기업 최고경영자와 정책 전문가들의 협의체인 글로벌 비즈니스 정책 위원회(Global Business Policy Council)는 1992년 첫 CEO 리트리트(CEO Retreat)를 연 것을 기점으로 활동해 왔으며, 이후 외국인직접투자(FDI) 신뢰지수, 글로벌 도시 지수 등 널리 인용되는 지수를 발표하게 되었다. 자세한 내용은 <a href="#research">연구와 지수</a> 항목에서 다룬다.</p>
+
+<h3>EDS 시대 (1995~2005)</h3>
+<p>1995년 커니는 미국의 대형 IT 서비스 기업 <strong>EDS(Electronic Data Systems)</strong>에 인수되었다. 인수는 1995년 8월 말 마무리되었으며, EDS의 공시 자료에는 현금 약 1억 1,300만 달러와 어음 약 1억 6,200만 달러에 더해 커니 인력에게 지급한 양도제한 주식이 대가로 기재되어 있다. 주식 보상을 포함한 총 인수 금액은 자료에 따라 다르게 전해진다. EDS는 IT 아웃소싱 사업과 경영 컨설팅을 결합해 고객에게 통합 서비스를 제공하려 했고, 커니는 EDS의 경영 컨설팅 부문으로 기능했다. 그러나 IT 서비스 기업과 독립 전략 컨설팅 회사 사이의 문화적 차이, 이해 상충 우려, 2000년대 초 컨설팅 경기 둔화 등이 겹치면서 시너지는 기대에 미치지 못했다는 평가가 많다.</p>
+
+<h3>파트너 경영자 인수와 독립 (2006)</h3>
+<p>EDS가 컨설팅 부문 매각을 추진하자, 커니의 파트너들은 회사를 직접 사들이기로 했다. 2005년 경영자 인수(MBO) 합의가 발표되었고, 거래는 2006년 초에 마무리되었다. 거래 완료 후 회사 지분은 임원(officer)들이 모두 보유하게 되었다. 이로써 커니는 다시 <strong>파트너가 소유하는 독립 회사</strong>가 되었으며, 이후 독립성과 파트너십 문화는 회사가 대외적으로 강조하는 핵심 가치가 되었다.</p>
+
+<h3>2020년 리브랜딩: ‘Kearney’</h3>
+<p>2020년 1월 회사는 오랫동안 써 온 ‘A.T. Kearney’에서 ‘A.T.’를 떼어내고 <span class="badge">Kearney</span>로 이름을 바꾸었으며, 새로운 로고와 시각 정체성을 도입했다. 회사는 이를 ‘회사의 훌륭한 점을 지키기 위해 회사를 새롭게 하는(refreshing)’ 작업으로 설명했다. 리브랜딩은 디지털·분석 역량 강화, 지속가능성 등 새로운 자문 영역에 대한 강조와 함께 진행되었다.</p>
+
+<h3>최근 동향</h3>
+<p>2018년 제9대 글로벌 매니징 파트너로 선출된 알렉스 리우(Alex Liu)는 두 차례 임기를 마쳤고, 2024년 밥 윌런(Bob Willen)이 제10대 글로벌 매니징 파트너로 선출되어 그해 4월 말부터 회사를 이끌고 있다. 커니는 2026년 창립 100주년을 맞아 ‘100년의 영향(100 years of impact)’을 주제로 기념 활동을 벌였다. 최근 몇 년간 회사는 인공지능과 데이터 분석, 에너지 전환과 지속가능성, 공급망 회복력 등을 주요 자문 주제로 내세우고 있다.</p>
+
+<h3>연표</h3>
+<div class="timeline">
+<div class="tl-item"><div class="tl-year">1926</div><div class="tl-body"><h4>시카고에서 창업</h4><p>제임스 O. 맥킨지가 시카고에 컨설팅 회사를 설립. 커니는 이 해를 자사의 기원으로 삼는다.</p></div></div>
+<div class="tl-item"><div class="tl-year">1937</div><div class="tl-body"><h4>제임스 맥킨지 사망</h4><p>창업자의 사망 후 시카고·뉴욕 파트너들 사이에 경영 방향을 둘러싼 이견이 커진다.</p></div></div>
+<div class="tl-item"><div class="tl-year">1939</div><div class="tl-body"><h4>분리</h4><p>뉴욕은 맥킨지 앤드 컴퍼니로, 시카고는 톰 커니가 이끄는 맥킨지, 커니 앤드 컴퍼니로 갈라진다.</p></div></div>
+<div class="tl-item"><div class="tl-year">1947</div><div class="tl-body"><h4>A.T. 커니 앤드 컴퍼니</h4><p>‘맥킨지’ 이름을 내려놓고 A.T. Kearney &amp; Company로 개명(회사 공식 연혁 기준, 일부 자료는 1946년).</p></div></div>
+<div class="tl-item"><div class="tl-year">1962</div><div class="tl-body"><h4>톰 커니 사망</h4><p>창업 파트너 앤드루 토머스 커니가 세상을 떠난다.</p></div></div>
+<div class="tl-item"><div class="tl-year">1960년대</div><div class="tl-body"><h4>유럽 진출</h4><p>뒤셀도르프 등을 거점으로 유럽 사무소 네트워크를 구축하기 시작.</p></div></div>
+<div class="tl-item"><div class="tl-year">1970년대</div><div class="tl-body"><h4>아시아 진출</h4><p>도쿄를 시작으로 아시아 시장에 진출.</p></div></div>
+<div class="tl-item"><div class="tl-year">1992</div><div class="tl-body"><h4>글로벌 비즈니스 정책 위원회</h4><p>글로벌 비즈니스 정책 위원회가 첫 CEO 리트리트를 열며 싱크탱크 활동을 본격화.</p></div></div>
+<div class="tl-item"><div class="tl-year">1995</div><div class="tl-body"><h4>EDS에 인수</h4><p>IT 서비스 기업 EDS의 경영 컨설팅 부문이 된다.</p></div></div>
+<div class="tl-item"><div class="tl-year">2006</div><div class="tl-body"><h4>파트너 경영자 인수(MBO)</h4><p>파트너들이 EDS로부터 회사를 되사들여 독립 파트너십으로 복귀.</p></div></div>
+<div class="tl-item"><div class="tl-year">2020</div><div class="tl-body"><h4>‘Kearney’로 리브랜딩</h4><p>‘A.T.’를 떼고 새 이름과 시각 정체성을 도입.</p></div></div>
+<div class="tl-item"><div class="tl-year">2024</div><div class="tl-body"><h4>리더십 교체</h4><p>밥 윌런이 알렉스 리우의 뒤를 이어 글로벌 매니징 파트너에 취임.</p></div></div>
+<div class="tl-item"><div class="tl-year">2026</div><div class="tl-body"><h4>창립 100주년</h4><p>1926년 창업으로부터 100년을 기념.</p></div></div>
+</div>
+
+<div class="callout">회사의 주요 인물에 관해서는 <a href="#people">주요 인물</a>, 회사 전반의 현황은 <a href="#overview">개요</a> 항목을 참고.</div>
+</section>
+
+<section class="article" id="services" data-title="서비스와 산업" data-icon="🧭">
+<h2>서비스와 산업</h2>
+<p class="lead">커니(Kearney)는 경영진을 대상으로 전략 수립부터 실행까지 아우르는 자문을 제공하는 종합 경영 컨설팅 회사이다. 서비스는 크게 기능(역량)별 실무 조직인 <strong>캐퍼빌리티 프랙티스</strong>와 산업별 전문 조직인 <strong>인더스트리 프랙티스</strong>가 교차하는 매트릭스 구조로 운영된다. 특히 운영(오퍼레이션)과 구매·조달 분야는 회사가 오랫동안 강점으로 내세워 온 영역으로, 업계에서 “실행 중심 컨설팅”이라는 평판을 얻는 데 기여하였다. 회사의 연혁은 <a href="#history">역사</a> 항목을, 발간 지수와 연구 조직은 <a href="#research">리서치와 지수</a> 항목을 참고할 수 있다.</p>
+
+<aside class="infobox">
+<div class="infobox-title">서비스 구조 개요</div>
+<table>
+<tr><th>조직 방식</th><td>기능별 프랙티스 × 산업별 프랙티스 매트릭스</td></tr>
+<tr><th>전통적 강점</th><td>운영 개선, 구매·조달, 공급망</td></tr>
+<tr><th>대표 진단 도구</th><td>AEP(Assessment of Excellence in Procurement), 구매 체스보드(Purchasing Chessboard)</td></tr>
+<tr><th>주요 고객층</th><td>다국적 기업, 사모펀드, 정부·공공기관</td></tr>
+</table>
+</aside>
+
+<h3>기능별 프랙티스</h3>
+<p>커니의 기능별 프랙티스는 고객 기업이 직면한 경영 과제의 유형에 따라 구분된다. 각 프랙티스는 독자적인 방법론과 벤치마크 데이터를 축적하고 있으며, 실제 프로젝트에서는 여러 프랙티스가 함께 참여하는 경우가 많다. 공식 명칭과 구분은 시기에 따라 개편되어 왔으므로 아래는 대표적인 영역을 정리한 것이다.</p>
+
+<div class="card-grid">
+<div class="card"><h4>운영 및 성과 개선</h4><p>제조·서비스 운영의 효율화, 원가 절감, 생산성 향상, 조직 슬림화 등을 다룬다. 창업 초기부터 이어진 효율성 컨설팅 전통을 계승한 분야로, 커니의 정체성을 이루는 핵심 영역으로 평가된다.</p></div>
+<div class="card"><h4>구매 및 조달 <span class="badge">핵심 강점</span></h4><p>전략적 소싱, 공급업체 관리, 지출 분석, 구매 조직 혁신을 지원한다. 커니는 이 분야에서 세계적으로 가장 널리 알려진 컨설팅 회사 중 하나로 꼽히며, 구매 역량 벤치마킹 연구와 다양한 조달 방법론을 보유하고 있다.</p></div>
+<div class="card"><h4>공급망 관리</h4><p>수요 예측, 재고·물류 최적화, 공급망 회복력 강화, 생산 거점 재배치(리쇼어링·니어쇼어링) 등을 다룬다. 지정학적 위험이 커지면서 공급망 재설계 수요가 늘어난 분야이다.</p></div>
+<div class="card"><h4>전략</h4><p>기업 및 사업부 전략, 성장 전략, 포트폴리오 재편, 시장 진입 전략 등을 수립한다. 최고경영진의 의사결정을 지원하는 전통적 전략 컨설팅 영역이다.</p></div>
+<div class="card"><h4>디지털 및 분석</h4><p>데이터 분석, 인공지능 활용, 디지털 전환, IT 전략을 지원한다. 커니는 2019년 데이터·분석 전문 기업 서벨로(Cervello)를 인수하여 이 분야의 실행 역량을 보강한 것으로 알려져 있다.</p></div>
+<div class="card"><h4>지속가능성</h4><p>탈탄소 전략, ESG 경영, 순환경제, 지속가능한 공급망 구축 등을 다룬다. 에너지 전환과 관련한 연구 활동과 연계되어 있다.</p></div>
+<div class="card"><h4>인수합병(M&amp;A)</h4><p>인수 대상 실사, 거래 전략, 인수 후 통합(PMI), 분할·매각 등을 지원한다. 사모펀드 고객을 위한 운영 실사와 포트폴리오 기업 가치 제고 업무도 포함된다.</p></div>
+<div class="card"><h4>전사적 변혁</h4><p>대규모 조직 변화, 턴어라운드, 비용 구조 혁신, 기업 문화 및 리더십 변화 관리 등 기업 전체를 아우르는 변혁 프로그램을 설계하고 실행한다.</p></div>
+<div class="card"><h4>마케팅·영업 및 가격</h4><p>고객 전략, 가격 정책, 영업 효율화, 브랜드 및 채널 전략을 다루며, 소비재·유통 산업 프랙티스와 밀접하게 연계된다.</p></div>
+<div class="card"><h4>조직 및 인재</h4><p>조직 구조 설계, 운영 모델 재편, 인재 전략, 일하는 방식의 혁신 등을 지원한다.</p></div>
+</div>
+
+<h3>구매 분야의 대표 도구</h3>
+<p>커니가 구매·조달 분야에서 쌓은 명성은 몇 가지 대표적인 연구와 도구로 상징된다.</p>
+<h4>AEP(Assessment of Excellence in Procurement)</h4>
+<p><strong>AEP</strong>는 커니가 장기간 수행해 온 글로벌 구매 역량 벤치마킹 연구이다. 세계 여러 산업의 기업들을 대상으로 구매 조직의 전략, 조직, 프로세스, 인재, 기술 활용 수준 등을 조사하여, 이른바 ‘구매 선도 기업’과 일반 기업의 차이를 분석한다. 연구 결과는 기업들이 자사의 구매 성숙도를 동종 기업과 비교하고 개선 방향을 찾는 기준으로 활용되어 왔으며, 1990년대부터 이어진 것으로 알려져 있다.</p>
+<h4>구매 체스보드(Purchasing Chessboard)</h4>
+<p><strong>구매 체스보드</strong>는 공급 시장의 힘과 구매 기업의 수요 협상력을 두 축으로 하여 구매 전략을 64개의 칸으로 체계화한 방법론이다. 커니 컨설턴트들이 저술한 동명의 서적을 통해 널리 소개되었으며, 구매 담당자가 품목별로 적합한 협상·소싱 전략을 선택하도록 돕는 도구로 쓰인다.</p>
+
+<div class="callout"><strong>참고:</strong> 커니는 컨설팅 업계에서 맥킨지·BCG·베인 등 이른바 ‘MBB’와 비교될 때 운영 및 구매 분야의 실행력이 차별점으로 자주 언급된다. 다만 회사의 서비스 범위는 전략·디지털·지속가능성 등으로 꾸준히 확장되어 왔다.</div>
+
+<h3>산업별 프랙티스</h3>
+<p>커니는 산업별 전문성을 갖춘 팀을 두어 해당 업계의 규제 환경, 경쟁 구도, 가치사슬에 특화된 자문을 제공한다. 주요 산업 프랙티스는 다음과 같다.</p>
+
+<table class="aqua-table">
+<thead>
+<tr><th>산업</th><th>주요 자문 주제</th></tr>
+</thead>
+<tbody>
+<tr><td>소비재 및 유통</td><td>브랜드·채널 전략, 매장 운영, 상품 기획, 해외 유통 시장 진출, 소비자 행동 분석. 소비자 연구 조직과 유통 시장 지수 발간으로 이 분야의 존재감이 크다.</td></tr>
+<tr><td>자동차</td><td>전동화와 자율주행 등 산업 전환 대응, 완성차·부품사 원가 혁신, 구매 및 공급망 재편, 모빌리티 신사업.</td></tr>
+<tr><td>항공우주 및 방위</td><td>방산 조달, 생산 능력 확대, 공급망 안정화, 항공사 및 MRO(정비) 운영 개선.</td></tr>
+<tr><td>에너지 및 공공 유틸리티</td><td>석유·가스 및 전력 산업의 효율화, 에너지 전환 전략, 재생에너지·수소 사업 검토, 규제 대응.</td></tr>
+<tr><td>헬스케어 및 생명과학</td><td>제약·의료기기 기업의 운영 및 공급망 개선, 병원·의료기관 경영 효율화, 제품 출시 전략.</td></tr>
+<tr><td>금융 서비스</td><td>은행·보험사의 비용 구조 혁신, 디지털 전환, 운영 모델 재설계, 규제 대응.</td></tr>
+<tr><td>통신·미디어·기술</td><td>통신사 네트워크 및 사업 전략, 미디어 산업 구조 변화 대응, 기술 기업의 성장 및 운영 전략.</td></tr>
+<tr><td>화학 및 소재</td><td>포트폴리오 재편, 원가 및 생산 효율화, 지속가능 소재 전략.</td></tr>
+<tr><td>산업재 및 제조</td><td>스마트 제조, 생산 거점 최적화, 산업용 장비 기업의 서비스화 전략.</td></tr>
+<tr><td>교통 및 물류·인프라</td><td>물류 네트워크 설계, 운송 사업자 효율화, 인프라 투자 전략.</td></tr>
+<tr><td>사모펀드 및 투자자</td><td>투자 대상 실사, 포트폴리오 기업 가치 제고, 엑시트 준비.</td></tr>
+<tr><td>정부 및 공공 부문</td><td>공공기관 효율화, 국가·도시 경쟁력 전략, 산업 정책 자문. 특히 중동 지역 정부 고객과의 협업이 활발한 것으로 알려져 있다.</td></tr>
+</tbody>
+</table>
+
+<h3>서비스 방식의 특징</h3>
+<p>커니의 컨설팅은 보고서 제출로 끝나기보다 고객 조직과 함께 개선 과제를 실행하고 측정 가능한 성과를 내는 데 초점을 맞추는 방식으로 소개된다. 일부 프로젝트에서는 컨설팅 보수의 일부를 달성 성과에 연동하는 계약 형태가 활용되기도 한다. 또한 지수·보고서 등 공개 연구 활동(<a href="#research">리서치와 지수</a> 참고)이 고객 관계 형성과 전문성 홍보의 수단으로 기능한다.</p>
+<p>한국에서의 주요 활동과 고객 산업에 대해서는 <a href="#korea">한국 사무소</a> 항목을, 관련 용어는 <a href="#glossary">용어 해설</a>을 참고할 수 있다.</p>
+</section>
+
+<section class="article" id="research" data-title="리서치와 지수" data-icon="📊">
+<h2>리서치와 지수</h2>
+<p class="lead">커니는 컨설팅 업무와 별도로 세계 경제·도시·투자·유통·소비자에 관한 정기 지수와 보고서를 발간하는 것으로 잘 알려져 있다. 대표적으로 <strong>글로벌 도시 지수(Global Cities Index)</strong>, <strong>FDI 신뢰 지수(FDI Confidence Index)</strong>, <strong>글로벌 서비스 입지 지수(Global Services Location Index)</strong>, <strong>리쇼어링 지수(Reshoring Index)</strong>, <strong>글로벌 리테일 개발 지수(Global Retail Development Index)</strong> 등이 있으며, 이들 지수는 언론, 정부, 기업의 투자 및 입지 결정 과정에서 자주 인용된다. 연구는 주로 사내 싱크탱크인 <strong>글로벌 비즈니스 정책 위원회(Global Business Policy Council)</strong>와 <strong>커니 소비자 연구소(Kearney Consumer Institute)</strong> 등이 주도한다.</p>
+
+<aside class="infobox">
+<div class="infobox-title">주요 연구 조직</div>
+<table>
+<tr><th>거시·정책 연구</th><td>Global Business Policy Council (GBPC)</td></tr>
+<tr><th>소비자 연구</th><td>Kearney Consumer Institute (KCI)</td></tr>
+<tr><th>에너지 연구</th><td>Kearney Energy Transition Institute</td></tr>
+<tr><th>대표 지수</th><td>Global Cities, FDI Confidence Index</td></tr>
+</table>
+</aside>
+
+<h3>주요 지수 및 보고서</h3>
+<p>아래 표는 커니가 발간해 왔거나 발간 중인 대표적인 지수와 보고서를 정리한 것이다. 시작 연도는 널리 알려진 자료를 기준으로 하였으며, 일부 보고서는 발간 주기나 명칭이 시기에 따라 바뀌었다.</p>
+
+<table class="aqua-table">
+<thead>
+<tr><th>이름</th><th>시작 연도</th><th>내용</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FDI 신뢰 지수</strong><br>(FDI Confidence Index)</td><td>1998</td><td>세계 주요 기업 경영진을 대상으로 설문조사를 실시하여 향후 외국인직접투자(FDI) 대상국으로 어느 나라를 선호하는지 순위화한 지수. 글로벌 비즈니스 정책 위원회가 발간하며 매년 갱신된다.</td></tr>
+<tr><td><strong>글로벌 리테일 개발 지수</strong><br>(Global Retail Development Index, GRDI)</td><td>2002</td><td>신흥 시장 가운데 유통 기업이 진출하기에 매력적인 국가를 시장 매력도, 국가 위험, 시장 포화도, 시간 압박(진출 적기) 등의 기준으로 평가한 지수.</td></tr>
+<tr><td><strong>글로벌 서비스 입지 지수</strong><br>(Global Services Location Index, GSLI)</td><td>2004</td><td>IT 서비스, 비즈니스 프로세스 아웃소싱(BPO) 등 서비스 업무의 해외 이전 입지로서 각국의 매력도를 재무적 매력도, 인력 기술과 가용성, 비즈니스 환경, 디지털 역량 등으로 평가한 지수.</td></tr>
+<tr><td><strong>글로벌 도시 지수·보고서</strong><br>(Global Cities Index / Report)</td><td>2008</td><td>세계 주요 도시의 국제적 영향력을 비즈니스 활동, 인적 자본, 정보 교류, 문화적 경험, 정치적 관여 등으로 평가한 지수. 이후 도시의 미래 잠재력을 평가하는 <em>글로벌 도시 전망(Global Cities Outlook)</em>이 함께 발표되고 있다.</td></tr>
+<tr><td><strong>리쇼어링 지수</strong><br>(Reshoring Index)</td><td>2014</td><td>미국 제조업의 해외 생산 이전과 국내 회귀(리쇼어링) 흐름을 미국의 제조업 수입 및 아시아 저비용 국가 의존도 변화를 통해 측정한 지수. 최근에는 멕시코 등으로의 니어쇼어링 동향도 함께 분석한다.</td></tr>
+<tr><td><strong>소비자 관련 연구</strong><br>(Kearney Consumer Institute)</td><td>미상 (2023년 이전부터 활동)</td><td>소비자 심리와 행동 변화를 정기 설문 기반으로 추적하는 연구 및 보고서 시리즈.</td></tr>
+<tr><td><strong>세계 경제 전망 보고서</strong><br>(Global Economic Outlook 등)</td><td>미상</td><td>글로벌 비즈니스 정책 위원회가 발표하는 거시 경제 및 지정학 시나리오 분석.</td></tr>
+</tbody>
+</table>
+
+<h3>글로벌 도시 지수</h3>
+<p>글로벌 도시 지수는 커니의 연구 가운데 대중적 인지도가 가장 높은 것으로 꼽힌다. 2008년 미국 외교 전문지 <em>포린 폴리시(Foreign Policy)</em>, 시카고 국제문제협의회(Chicago Council on Global Affairs)와 협력하여 처음 발표되었으며, 이후 커니가 독자적으로 매년 보고서를 발간하고 있다. 뉴욕, 런던, 파리, 도쿄 등이 상위권을 차지하는 경향이 있으며, 서울을 비롯한 아시아 도시들의 순위 변동은 각국 언론에서 꾸준히 보도된다. 지수는 현재의 위상을 측정하는 <strong>글로벌 도시 지수</strong>와 개인 복지, 경제, 혁신, 거버넌스 등을 바탕으로 미래 잠재력을 가늠하는 <strong>글로벌 도시 전망</strong>의 두 축으로 구성된다.</p>
+
+<h3>FDI 신뢰 지수</h3>
+<p>FDI 신뢰 지수는 1998년 처음 발표된 이래 커니의 대표적인 장수 연구로 자리 잡았다. 매년 세계 각국의 대기업 최고경영진을 대상으로 향후 3년간 투자 의향이 있는 국가를 조사하며, 미국이 오랫동안 1위를 유지해 온 것으로 알려져 있다. 국가별 순위와 함께 투자 결정에 영향을 미치는 요인, 지정학적 위험에 대한 인식, 기술·세제 등 정책 환경에 대한 경영진의 시각을 함께 분석한다. 각국 정부와 투자진흥기관이 자국의 투자 매력도를 홍보하거나 점검할 때 자주 인용한다.</p>
+
+<h3>글로벌 서비스 입지 지수</h3>
+<p>글로벌 서비스 입지 지수는 아웃소싱과 오프쇼어링이 확산되던 2004년 ‘해외 입지 매력도 지수(Offshore Location Attractiveness Index)’라는 이름으로 처음 발표되었다. 인도가 오랫동안 최상위권을 차지해 왔으며, 중국, 말레이시아, 필리핀, 동유럽 국가 등이 주요 서비스 입지로 평가되었다. 최근 판에서는 디지털 인재와 자동화·인공지능 확산이 서비스 입지 경쟁에 미치는 영향도 반영하고 있다.</p>
+
+<h3>리쇼어링 지수</h3>
+<p>리쇼어링 지수는 미국 제조업이 해외에서 본국으로 돌아오는 현상을 정량적으로 측정하기 위해 고안되었다. 미국 국내 제조업 생산과 아시아 저비용 국가로부터의 제조업 수입을 비교하는 방식으로 산출되며, 미·중 무역 갈등과 공급망 재편 국면에서 특히 주목을 받았다. 이 지수는 커니의 <a href="#services">공급망 관리 프랙티스</a>와 밀접하게 연계된다.</p>
+
+<h3>글로벌 리테일 개발 지수</h3>
+<p>글로벌 리테일 개발 지수는 2002년부터 발표된 신흥국 유통 시장 평가 지수로, 중국, 인도, 브라질, 동남아시아 국가 등이 상위권에 오르며 글로벌 유통 기업의 해외 진출 전략 수립에 참고 자료로 활용되었다. 발간 주기와 형식은 시기에 따라 달라졌다.</p>
+
+<h3>연구 조직</h3>
+<div class="card-grid">
+<div class="card"><h4>글로벌 비즈니스 정책 위원회</h4><p>Global Business Policy Council(GBPC)은 1992년 첫 CEO 리트리트를 연 이래 활동해 온 커니의 전문 연구 조직으로, 세계 경제·지정학 동향을 분석하고 FDI 신뢰 지수와 글로벌 도시 보고서 등을 발간한다. 각국 정부 및 기업 최고경영진과의 대화 프로그램도 운영한다.</p></div>
+<div class="card"><h4>커니 소비자 연구소</h4><p>Kearney Consumer Institute(KCI)는 소비자의 인식과 행동 변화를 연구하는 조직으로, 정기 설문 조사와 보고서를 통해 소비 트렌드와 유통·소비재 산업에 대한 시사점을 제시한다.</p></div>
+<div class="card"><h4>커니 에너지 전환 연구소</h4><p>Kearney Energy Transition Institute는 저탄소 에너지 기술과 에너지 전환에 관한 연구 자료를 발간하는 조직으로, 수소, 탄소 포집, 재생에너지 등 기술별 분석 보고서를 공개해 왔다.</p></div>
+</div>
+
+<blockquote>커니의 공개 지수들은 컨설팅 회사의 연구 브랜드를 대표하는 동시에, 도시·국가 경쟁력을 둘러싼 공공 담론에 영향을 미치는 자료로 평가된다.</blockquote>
+
+<div class="callout"><strong>유의 사항:</strong> 지수별 세부 순위와 평가 지표는 판(版)마다 변경되므로, 특정 연도의 결과를 인용할 때는 해당 연도 보고서 원문을 확인하는 것이 바람직하다. 한국과 서울의 순위 관련 내용은 <a href="#korea">한국 사무소</a> 항목에서 다룬다.</div>
+</section>
+
+<section class="article" id="people" data-title="인물과 조직문화" data-icon="👥">
+<h2>인물과 조직문화</h2>
+<p class="lead">커니(Kearney)는 1926년 시카고에서 출발한 컨설팅 회사로, 창립 초기의 핵심 인물인 앤드루 토머스 커니(Andrew Thomas Kearney)의 이름을 회사명으로 쓰고 있다. 현재는 파트너가 소유하고 운영하는 파트너십 구조이며, 글로벌 매니징 파트너가 회사를 이끈다. 호기심(Curiosity), 대담함(Boldness), 관대함(Generosity), 연대(Solidarity), 열정(Passion)이라는 다섯 가지 핵심 가치를 공식적으로 내세운다. 채용과 승진은 전략 컨설팅 업계에서 흔히 볼 수 있는 단계형 구조를 따른다.</p>
+
+<aside class="infobox">
+<div class="infobox-title">커니의 리더십 개요</div>
+<table>
+<tr><th>창립 인물</th><td>앤드루 토머스 커니 (Andrew Thomas "Tom" Kearney)</td></tr>
+<tr><th>최고 책임자</th><td>글로벌 매니징 파트너 (Global Managing Partner)</td></tr>
+<tr><th>현 글로벌 매니징 파트너</th><td>밥 윌런 (Bob Willen), 2024년 취임, 제10대</td></tr>
+<tr><th>직전 글로벌 매니징 파트너</th><td>알렉스 리우 (Alex Liu), 2018–2024년, 제9대, 연임</td></tr>
+<tr><th>소유 구조</th><td>파트너 소유 (2006년 경영진 인수 이후)</td></tr>
+<tr><th>핵심 가치</th><td>Curiosity · Boldness · Generosity · Solidarity · Passion</td></tr>
+</table>
+</aside>
+
+<h3>창립 인물: 앤드루 토머스 커니</h3>
+<p>앤드루 토머스 커니는 흔히 '톰 커니(Tom Kearney)'라고 불린다. 그는 시카고대학교 교수였던 제임스 O. 맥킨지(James O. McKinsey)가 세운 회계·경영 자문 회사에 합류해 초기 파트너가 되었다. 맥킨지가 1937년 세상을 떠난 뒤 회사는 조직 개편을 겪었고, 시카고 사무소는 커니를 중심으로 독립해 나중에 <strong>A.T. Kearney &amp; Company</strong>라는 이름을 쓰게 되었다. 이런 사정 때문에 커니와 맥킨지 앤드 컴퍼니는 뿌리가 같은 회사로 자주 언급된다. 창립 시기와 분리 과정은 <a href="#history">역사</a> 항목에 더 자세히 나와 있다.</p>
+<p>커니의 경영 철학은 고객에게 정직하고 실질적인 조언을 하는 것으로 요약된다. 회사는 지금도 창립자의 이 정신을 조직문화의 출발점으로 소개한다. 회사 안팎에서는 이를 '본질적인 올바름(essential rightness)'이라는 표현으로 전하기도 한다. 다만 이 문구가 창립자가 남긴 원문인지는 이 항목에서 확인하지 못했다.</p>
+
+<h3>지배구조와 리더십</h3>
+<p>커니는 1995년 미국 IT 서비스 기업 EDS(Electronic Data Systems)에 인수되었다가, 2006년 파트너들이 경영권을 다시 사들이는 경영진 인수(MBO)를 거쳐 독립 파트너십으로 돌아왔다. 그 뒤로 회사는 파트너가 지분을 나누어 갖고 경영에 참여하는 구조를 유지하고 있다.</p>
+<p>최고 책임자는 <strong>글로벌 매니징 파트너</strong>로, 파트너들의 선출로 정해지며 연임할 수 있다. 최근 사례를 보면 한 임기는 3년이었다. 이사회(Board of Directors)는 장기 전략, 파트너 선출, 지배구조와 관련된 사안을 감독한다. 여기에 지역별·국가별 매니징 파트너와 산업·기능별 프랙티스 리더가 함께하는 다층적인 운영 체계를 갖추고 있다. 아시아태평양처럼 큰 지역에는 지역 의장(Region Chair)이 따로 있다.</p>
+
+<h3>역대 주요 리더</h3>
+<table class="aqua-table">
+<thead>
+<tr><th>인물</th><th>시기</th><th>주요 내용</th></tr>
+</thead>
+<tbody>
+<tr><td>앤드루 토머스 커니</td><td>창립기–20세기 중반</td><td>회사의 이름이 된 창립 인물. 맥킨지와 분리된 뒤 시카고 회사를 이끌었다.</td></tr>
+<tr><td>프레드 스타인그레이버 (Fred Steingraber)</td><td>1983–2000년 무렵</td><td>회장 겸 CEO로서 해외 확장을 이끌었다. EDS에 인수되던 시기에도 회사를 이끌었다.</td></tr>
+<tr><td>요한 아우릭 (Johan Aurik)</td><td>2012–2018</td><td>매니징 파트너 겸 이사회 의장. 3년 임기를 두 차례 지냈다. 유럽 출신 리더로서 글로벌 운영 체계를 다졌다.</td></tr>
+<tr><td>알렉스 리우 (Alex Liu)</td><td>2018–2024</td><td>제9대 글로벌 매니징 파트너로 2018년 선출되어 연임했다. 재임 중인 2020년 1월 사명을 'A.T. Kearney'에서 'Kearney'로 바꾸고 브랜드를 개편했다.</td></tr>
+<tr><td>밥 윌런 (Bob Willen)</td><td>2024–현재</td><td>제10대 글로벌 매니징 파트너, CEO 겸 이사회 의장. 2026년 창립 100주년을 이끌고 있다.</td></tr>
+</tbody>
+</table>
+<div class="callout">위 표에는 공개 자료로 확인할 수 있는 인물만 실었다. 역대 리더의 정확한 재임 연도는 자료마다 조금씩 다르므로, 확실하지 않은 경우에는 시기만 대략 적었다.</div>
+
+<h3>동문 네트워크</h3>
+<p>여느 대형 컨설팅 회사와 마찬가지로 커니 출신 인사들은 대기업 임원, 사모펀드와 벤처캐피털, 스타트업 창업, 공공 부문 등으로 폭넓게 진출해 있다. 회사는 공식 동문(Alumni) 프로그램으로 퇴직자와의 관계를 이어 가며, 동문은 비공식적인 사업 기회와 채용 경로의 역할도 한다. 이 항목에서는 출처로 검증하지 못한 개별 동문의 이름은 싣지 않았다.</p>
+
+<h3>조직문화와 핵심 가치</h3>
+<p>커니는 공식 웹사이트의 '문화와 가치(Culture and Values)' 페이지에서 다섯 가지 핵심 가치를 소개한다. 해마다 이 가치를 잘 실천한 구성원을 가치별로 시상하는 'Value Awards'도 운영한다.</p>
+<div class="card-grid">
+<div class="card"><h4>호기심 (Curiosity)</h4><p>질문을 멈추지 않고 새로운 관점과 지식을 찾아가는 태도.</p></div>
+<div class="card"><h4>대담함 (Boldness)</h4><p>현 상태에 안주하지 않고, 고객에게 필요하다면 불편한 진실도 제시하는 용기.</p></div>
+<div class="card"><h4>관대함 (Generosity)</h4><p>지식과 시간을 아낌없이 나누고, 동료와 고객의 성장을 돕는 자세.</p></div>
+<div class="card"><h4>연대 (Solidarity)</h4><p>서로의 안녕을 살피며 한 팀으로 움직이는 협업 문화.</p></div>
+<div class="card"><h4>열정 (Passion)</h4><p>일과 삶에서 최선의 자신이 되려는 동기.</p></div>
+</div>
+<p>회사는 성과 중심의 컨설팅 업계에서 협업적이고 따뜻한 문화를 장점으로 내세운다. 업계에서는 커니가 실행과 운영 개선에 강하다는 평판과 이런 문화를 함께 언급하는 경우가 많다. 이러한 강점의 구체적인 서비스 영역은 <a href="#services">서비스</a> 항목에서 다룬다.</p>
+
+<h3>채용과 경력 경로</h3>
+<p>커니의 컨설팅 직군은 대체로 다음과 같은 단계형 경력 구조를 따른다. 직급의 이름과 구분은 국가와 사무소에 따라 조금씩 다를 수 있다.</p>
+<ol>
+<li><strong>비즈니스 애널리스트(Business Analyst)</strong>: 학부 졸업자가 주로 입사하는 단계로, 자료 조사와 분석, 모델링을 맡는다. 일부 사무소에는 시니어 비즈니스 애널리스트 단계가 따로 있다.</li>
+<li><strong>어소시에이트(Associate)</strong>: MBA 등 대학원 졸업자나 경력직이 입사하는 단계로, 프로젝트의 한 업무 영역을 책임진다.</li>
+<li><strong>매니저(Manager)</strong>: 프로젝트 팀을 꾸려 일상적인 운영과 고객 커뮤니케이션을 맡는다.</li>
+<li><strong>프린시펄(Principal)</strong>: 여러 프로젝트와 고객 관계를 관리하며 파트너가 되기 위한 준비를 한다.</li>
+<li><strong>파트너(Partner)</strong>: 회사의 공동 소유자로서 고객을 개발하고 프랙티스를 이끈다. 위로는 시니어 파트너 등의 직급이 있다.</li>
+</ol>
+<p>채용 과정은 서류 전형과 필기 또는 온라인 평가를 거친 뒤, 여러 차례의 <strong>케이스 인터뷰</strong>와 적합성(fit) 면접으로 이루어지는 것이 일반적이다. 케이스 인터뷰에서는 시장 규모 추정, 수익성 분석, 시장 진입 전략, 비용 절감이나 운영 개선 같은 사업 문제를 구조적으로 풀어 가는 능력을 본다. 커니는 운영과 구매 분야로 잘 알려져 있어, 이와 관련된 주제가 면접에 나올 수 있다는 이야기가 지원자들 사이에서 오간다. 한국 사무소의 채용에 관한 내용은 <a href="#korea">한국에서의 커니</a> 항목을 참고하면 된다.</p>
+</section>
+
+<section class="article" id="korea" data-title="한국에서의 커니" data-icon="🇰🇷">
+<h2>한국에서의 커니</h2>
+<p class="lead">커니 코리아(Kearney Korea)는 글로벌 컨설팅 회사 커니의 서울 사무소다. 한국에서는 오랫동안 'AT커니(A.T. 커니)'라는 이름으로 알려져 왔다. 대기업 중심인 한국의 산업 구조에 맞춰 제조, 소비재·유통, 금융, 통신·하이테크 등 여러 산업에서 전략과 운영 개선 프로젝트를 수행해 왔다. 국내 전략 컨설팅 시장에서는 이른바 'MBB'로 불리는 3대 회사의 뒤를 잇는 주요 글로벌 전략 컨설팅 회사로 꼽힌다.</p>
+
+<aside class="infobox">
+<div class="infobox-title">커니 코리아</div>
+<table>
+<tr><th>명칭</th><td>커니 코리아 (Kearney Korea)</td></tr>
+<tr><th>옛 명칭</th><td>AT커니 코리아 (A.T. Kearney Korea)</td></tr>
+<tr><th>소재지</th><td>대한민국 서울</td></tr>
+<tr><th>소속</th><td>커니 아시아태평양 지역</td></tr>
+<tr><th>주요 분야</th><td>전략, 운영, 구매·공급망, 조직, 디지털 전환</td></tr>
+<tr><th>시장 내 위상</th><td>MBB에 이어지는 주요 글로벌 전략 컨설팅 회사 중 하나</td></tr>
+</table>
+</aside>
+
+<h3>개요와 연혁</h3>
+<p>커니는 20세기 후반 아시아 시장을 넓히는 과정에서 한국에 진출했다. 서울 사무소는 1990년대 무렵부터 국내 기업을 상대로 활동해 온 것으로 알려져 있다. 다만 정확한 설립 연도는 공개 자료로 확인하지 못해 이 항목에 적지 않았다. 1990년대 후반 외환위기 이후 국내 기업들은 구조조정과 경영 혁신을 서둘렀고, 글로벌 컨설팅 회사에 대한 수요도 크게 늘었다. 커니를 포함한 외국계 전략 컨설팅 회사들은 이 시기에 한국 시장에서 입지를 넓혔다.</p>
+<p>본사가 2020년 1월 사명을 'A.T. Kearney'에서 'Kearney'로 바꾸면서 한국 사무소도 '커니'라는 이름을 쓰기 시작했다. 그러나 언론과 업계, 취업 준비생 사이에서는 지금도 'AT커니'라는 옛 이름이 함께 쓰인다. 사명 변경의 배경은 <a href="#history">역사</a> 항목에서 다룬다.</p>
+
+<h3>주요 산업 분야</h3>
+<p>커니 코리아의 프로젝트는 한국 경제를 이끄는 대기업 그룹과 주요 산업을 중심으로 이루어진다. 공개된 인사이트 보고서와 언론 보도에 자주 나오는 분야는 다음과 같다.</p>
+<div class="card-grid">
+<div class="card"><h4>제조·자동차·산업재</h4><p>생산 운영 효율화, 원가 절감, 글로벌 생산 거점 전략, 전동화 같은 산업 전환에 대응하는 전략.</p></div>
+<div class="card"><h4>전자·하이테크·통신</h4><p>사업 포트폴리오 전략, 신사업 발굴, 공급망 재편, 디지털 서비스 전략.</p></div>
+<div class="card"><h4>소비재·유통</h4><p>유통 채널 전략, 브랜드·상품 전략, 오프라인 유통의 디지털 전환. 커니의 글로벌 소매 연구와 연결된 영역이다.</p></div>
+<div class="card"><h4>금융</h4><p>금융회사의 성장 전략, 운영 혁신, 디지털 금융 대응.</p></div>
+<div class="card"><h4>에너지·화학</h4><p>사업 구조 재편, 탄소 감축과 지속가능성 전략.</p></div>
+<div class="card"><h4>구매·공급망 (기능 영역)</h4><p>커니가 세계적으로 강점을 지닌 분야. 산업을 가리지 않고 구매 혁신과 공급망 최적화 프로젝트가 많다.</p></div>
+</div>
+<p>위 분류는 공개 자료에 드러난 경향을 정리한 것이다. 커니 코리아가 공식적으로 정한 프랙티스 체계와는 다를 수 있다. 커니의 글로벌 서비스 체계는 <a href="#services">서비스</a> 항목에, 대표적인 연구 보고서는 <a href="#research">연구와 지수</a> 항목에 정리되어 있다.</p>
+
+<h3>국내 컨설팅 시장에서의 위상</h3>
+<p>한국 전략 컨설팅 시장에서는 맥킨지 앤드 컴퍼니, 보스턴 컨설팅 그룹(BCG), 베인 앤드 컴퍼니를 묶어 흔히 <strong>MBB</strong>라고 부른다. 이들은 인지도와 대형 전략 프로젝트 수주에서 앞서 있는 것으로 평가된다. 커니는 롤랜드버거, 아서디리틀(ADL), 스트래티지앤(Strategy&amp;) 등과 함께 MBB 다음 그룹의 주요 글로벌 전략 컨설팅 회사로 자주 거론된다. 회계법인 계열 컨설팅 조직(이른바 Big 4 계열)이나 국내 컨설팅 회사와는 서비스 성격이 어느 정도 구분된다.</p>
+<table class="aqua-table">
+<thead>
+<tr><th>구분</th><th>대표 회사</th><th>일반적인 이미지</th></tr>
+</thead>
+<tbody>
+<tr><td>MBB</td><td>맥킨지, BCG, 베인</td><td>최상위 전략 과제, 가장 높은 브랜드 인지도</td></tr>
+<tr><td>기타 글로벌 전략 컨설팅</td><td>커니, 롤랜드버거, ADL, 스트래티지앤 등</td><td>전략과 실행의 결합, 특정 산업·기능에 대한 전문성</td></tr>
+<tr><td>회계법인 계열 컨설팅</td><td>딜로이트, PwC, EY, KPMG 계열</td><td>대규모 실행, IT 구축, 재무·리스크 자문</td></tr>
+</tbody>
+</table>
+<p>업계에서 커니는 전략 수립에 그치지 않고 운영 개선, 구매·원가 혁신 등 <em>실행 가능한 결과</em>에 강한 회사라는 평판을 듣는다. 제조 중심의 한국 산업 구조와 맞아떨어진다는 평가도 있다. 다만 이러한 위상과 평판은 업계 인식과 취업 시장의 통념에 기댄 것이다. 객관적인 순위나 매출 규모로 공식 확인된 것은 아니다.</p>
+
+<h3>채용 관련 참고 사항</h3>
+<p>커니 코리아는 학부 졸업자를 대상으로 비즈니스 애널리스트를, MBA 졸업자와 경력직을 대상으로 어소시에이트 이상 직급을 채용하는 것이 일반적이다. 인턴십(RA·인턴 컨설턴트 등)이 정규직 채용으로 이어지는 경로도 국내 지원자들에게 잘 알려져 있다.</p>
+<ul>
+<li><strong>전형 구성</strong>: 대체로 서류 전형, 필기 또는 온라인 평가, 여러 차례의 케이스 인터뷰와 파트너 면접으로 이루어진다.</li>
+<li><strong>언어</strong>: 국내 고객사 프로젝트가 많아 한국어 실무 능력이 중요하다. 동시에 글로벌 팀과 협업하고 영문 보고서를 쓰기 때문에 영어 능력도 요구된다. 면접의 일부를 영어로 진행하기도 한다.</li>
+<li><strong>준비 경향</strong>: 국내 취업 준비생들은 케이스 인터뷰 스터디, 업계 선배와의 커피챗, 컨설팅 동아리 활동으로 MBB와 커니 등 전략 컨설팅 회사의 전형을 함께 준비하는 경우가 많다.</li>
+</ul>
+<div class="callout">구체적인 채용 시기, 인원, 전형 단계는 해마다 바뀔 수 있다. 지원하려면 커니 공식 채용 페이지의 최신 공고를 확인하는 것이 좋다. 직급 체계 전반은 <a href="#people">인물과 조직문화</a> 항목에 정리되어 있다.</div>
+</section>
+
+<section class="article" id="other-meanings" data-title="다른 뜻 / 동음이의" data-icon="🔀">
+  <h2>다른 뜻 / 동음이의</h2>
+  <p class="lead">'커니(Kearney)'는 이 백과사전이 주로 다루는 글로벌 경영컨설팅사 <a href="#overview">커니(옛 A.T. 커니)</a> 말고도 여러 대상을 가리킨다. 아일랜드계 성씨에서 온 이름이어서 미국 중서부 도시, 캐나다의 작은 타운, 노동운동가, 철학자 같은 인물 이름에 두루 쓰인다. 'Kearny'처럼 e가 빠진 철자도 있어 서로 혼동되기 쉽다. 이 문서에서는 같은 이름으로 불리는 대상을 지명·인물·어원으로 나누어 정리한다.</p>
+
+  <div class="callout"><strong>철자 주의:</strong> <em>Kearney</em>(e 있음)와 <em>Kearny</em>(e 없음)는 발음이 거의 같지만 다른 표기다. 미국 육군 장군 스티븐 W. 커니(Stephen W. Kearny)와 그 조카 필립 커니(Philip Kearny)는 'Kearny'로 쓰며, 이들의 이름을 딴 지명도 원래 'Kearny'였다. 네브래스카주 커니 시처럼 나중에 'Kearney'로 굳어진 곳도 있다.</div>
+
+  <h3>지명</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>커니 (네브래스카주) <span class="badge">미국 · 도시</span></h4>
+      <p>미국 네브래스카주 버펄로 카운티의 도시이자 카운티 소재지다. 플랫강(Platte River) 유역에 있으며 오리건 트레일을 비롯한 서부 개척로의 요충지였다. 시 이름은 인근 포트 커니(Fort Kearny)에서 왔다. 우편 업무 과정에서 'Kearney'로 잘못 적힌 철자가 그대로 굳었다고 알려져 있다. 봄마다 플랫강에 모여드는 캐나다두루미(sandhill crane) 무리와, 개척로 역사를 전시하는 그레이트 플랫강 로드 아치웨이(Great Platte River Road Archway) 기념관으로 유명하다.</p>
+    </div>
+    <div class="card">
+      <h4>네브래스카 대학교 커니 캠퍼스 <span class="badge">교육기관</span></h4>
+      <p>University of Nebraska at Kearney(UNK). 네브래스카 대학교 체계에 속한 공립대학으로 커니 시에 있다. 사범학교로 출발해 주립대학을 거쳐 1991년 네브래스카 대학교 체계에 편입되었다. 교육학·경영학·보건 계열 프로그램을 중심으로 지역 고등교육을 맡고 있다.</p>
+    </div>
+    <div class="card">
+      <h4>포트 커니 (Fort Kearny) <span class="badge">역사 유적</span></h4>
+      <p>1848년 네브래스카 플랫강 변에 세워진 미 육군 요새다. 오리건·캘리포니아·모르몬 트레일을 지나던 이주민을 보호하고 보급하는 거점이었다. 스티븐 W. 커니 장군의 이름을 땄기 때문에 철자는 e가 없는 'Kearny'다. 지금은 포트 커니 주립 역사공원으로 보존되어 있다.</p>
+    </div>
+    <div class="card">
+      <h4>커니 카운티 (네브래스카주) <span class="badge">미국 · 카운티</span></h4>
+      <p>Kearney County. 네브래스카주 중남부의 카운티로 소재지는 민든(Minden)이다. 이 이름 역시 포트 커니에서 왔다. 커니 시는 이 카운티가 아니라 이웃한 버펄로 카운티에 있으므로 서로 구별해야 한다.</p>
+    </div>
+    <div class="card">
+      <h4>커니 (미주리주) <span class="badge">미국 · 도시</span></h4>
+      <p>미주리주 클레이 카운티의 소도시로 캔자스시티 대도시권 북쪽에 있다. 서부 개척 시대의 무법자 제시 제임스(Jesse James)가 태어나고 묻힌 곳으로 알려져 있다. 그의 생가는 '제시 제임스 생가 및 박물관'으로 공개되고 있다.</p>
+    </div>
+    <div class="card">
+      <h4>커니 (온타리오주) <span class="badge">캐나다 · 타운</span></h4>
+      <p>Kearney. 캐나다 온타리오주 패리사운드 지구(Parry Sound District)의 작은 타운이다. 알곤퀸 주립공원 서쪽의 호수·삼림 지대에 있어 여름 휴양과 카누 여행의 출발지로 쓰인다.</p>
+    </div>
+    <div class="card">
+      <h4>커니 (뉴저지주)? → Kearny <span class="badge">철자 다름</span></h4>
+      <p>뉴저지주 허드슨 카운티의 도시는 'Kearney'가 아니라 <strong>Kearny</strong>다. 남북전쟁 때 전사한 북군 장군 필립 커니(Philip Kearny)의 이름을 땄다. 우리말로는 똑같이 '커니'로 옮겨지기 쉬워 검색이나 번역에서 자주 혼동된다.</p>
+    </div>
+  </div>
+
+  <h3>인물</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4>앤드루 토머스 커니 <span class="badge">컨설팅사 창업자</span></h4>
+      <p>Andrew Thomas Kearney. 컨설팅사 커니의 이름이 된 인물이다. 시카고에서 제임스 O. 맥킨지의 회사에 합류했으며, 맥킨지가 세상을 떠난 뒤 1939년 회사가 나뉠 때 시카고 쪽 조직을 이끌었다. 이 조직이 훗날 A.T. 커니가 되었다. 자세한 내용은 <a href="#history">역사</a>와 <a href="#people">주요 인물</a> 항목에서 다룬다.</p>
+    </div>
+    <div class="card">
+      <h4>데니스 커니 <span class="badge">노동운동가</span></h4>
+      <p>Denis Kearney(1847–1907). 아일랜드에서 태어나 미국 샌프란시스코에서 활동한 선동가로, 1870년대 후반 캘리포니아 노동자당(Workingmen's Party of California)을 이끌었다. 노동자의 불만을 중국인 이민자 배척 운동으로 몰아갔으며 "중국인은 물러가라(The Chinese must go!)"는 구호로 알려졌다. 이 운동은 1882년 중국인 배척법으로 이어진 반이민 여론을 키운 요인 가운데 하나로 평가된다.</p>
+    </div>
+    <div class="card">
+      <h4>리처드 커니 <span class="badge">철학자</span></h4>
+      <p>Richard Kearney(1954–). 아일랜드의 철학자로 현상학과 해석학을 연구한다. 미국 보스턴 칼리지 철학과 교수다. 상상력, 서사, 타자성, 종교 이후의 신앙('아나테이즘', Anatheism)을 주제로 책을 썼으며, 대표 저서로 『The Wake of Imagination』과 『Strangers, Gods and Monsters』가 있다.</p>
+    </div>
+    <div class="card">
+      <h4>피더 커니 <span class="badge">작사가</span></h4>
+      <p>Peadar Kearney(1883–1942). 아일랜드의 민족주의 작사가다. 아일랜드 국가 「병사의 노래(Amhrán na bhFiann / A Soldier's Song)」의 영어 가사를 썼다.</p>
+    </div>
+    <div class="card">
+      <h4>스티븐 W. 커니 <span class="badge">철자: Kearny</span></h4>
+      <p>Stephen Watts Kearny(1794–1848). 미국 육군 장군으로, 멕시코–미국 전쟁 때 '서부군(Army of the West)'을 이끌고 뉴멕시코와 캘리포니아로 진군했다. 포트 커니와, 이를 거쳐 생긴 네브래스카의 여러 지명이 그의 이름에서 비롯되었다. 그의 조카 필립 커니(Philip Kearny, 1815–1862)는 남북전쟁의 북군 장군으로 뉴저지주 Kearny 시에 이름을 남겼다.</p>
+    </div>
+  </div>
+
+  <h3>성씨의 기원</h3>
+  <p><strong>Kearney</strong>는 아일랜드 게일어 성씨를 영어식으로 적은 이름이다. 서로 다른 몇 갈래의 게일어 성이 영어 표기 과정에서 모두 Kearney, Kearny, Carney 같은 비슷한 형태로 합쳐졌다고 본다.</p>
+  <ul>
+    <li><strong>Ó Catharnaigh</strong>: <em>catharnach</em>(전사, 무장한 병사)에서 온 이름으로 보는 견해가 일반적이다. 아일랜드 중부 테프파(Teffia, 오늘날 웨스트미스 일대)의 가문이 이 성을 썼으며, 이 가문의 일부는 훗날 영어 성 'Fox'로 바꾼 것으로도 알려져 있다.</li>
+    <li><strong>Ó Cearnaigh</strong>: <em>cearnach</em>(승리한, 전쟁의)에서 온 이름으로 풀이된다. 아일랜드 여러 지역에 독립된 가계가 있었다.</li>
+    <li><strong>Mac Cearnaigh</strong>: 'Ó'(~의 후손) 대신 'Mac'(~의 아들)을 붙인 형태로, 역시 Kearney나 Carney로 영어화되었다.</li>
+  </ul>
+  <p>19세기 아일랜드 이민이 늘면서 이 성씨는 미국, 캐나다, 영국, 오스트레일리아로 퍼졌다. 위에 나온 북미 지명 상당수도 아일랜드계 인물이나 그 이름을 딴 군사 시설에서 유래했다.</p>
+
+  <blockquote>이 백과사전에서 '커니'라고만 쓰면, 따로 밝히지 않는 한 경영컨설팅사 커니(Kearney, 옛 A.T. Kearney)를 가리킨다. 회사에 대한 개요는 <a href="#overview">개요</a>를, 용어 설명은 <a href="#glossary">용어 사전 &amp; FAQ</a>를 참고한다.</blockquote>
+</section>
+
+<section class="article" id="glossary" data-title="용어 사전 &amp; FAQ" data-icon="📖">
+  <h2>용어 사전 &amp; FAQ</h2>
+  <p class="lead">경영컨설팅 업계에서는 영어 약어와 업계 특유의 직급·업무 용어가 많이 쓰인다. 이 문서는 커니와 컨설팅 산업을 이해하는 데 필요한 주요 용어를 우리말 이름, 영문, 설명 순서로 정리하고, 독자가 자주 묻는 질문에 짧게 답한다. 회사 개요는 <a href="#overview">개요</a>, 서비스 영역은 <a href="#services">서비스</a>, 대표 연구 보고서는 <a href="#research">연구·지수</a> 항목에서 더 자세히 다룬다.</p>
+
+  <h3>주요 용어</h3>
+  <table class="aqua-table">
+    <thead>
+      <tr><th>용어</th><th>영문</th><th>설명</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>MBB</strong></td><td>McKinsey, BCG, Bain</td><td>세계 3대 전략컨설팅사로 꼽히는 맥킨지, 보스턴컨설팅그룹, 베인앤드컴퍼니의 머리글자를 딴 업계 통칭이다. 전략컨설팅 시장의 최상위 그룹을 가리킬 때 쓴다.</td></tr>
+      <tr><td><strong>Tier 2 전략컨설팅</strong></td><td>Tier-2 Strategy Consulting</td><td>MBB 다음 그룹으로 분류되는 전략컨설팅사를 부르는 비공식 용어다. 커니, 롤랜드버거, 올리버와이먼, 스트래티지앤드(Strategy&amp;), L.E.K. 등이 흔히 거론된다. 공식 기준이 있는 분류는 아니며, 산업이나 지역에 따라 평가가 다르다.</td></tr>
+      <tr><td><strong>구매·조달</strong></td><td>Procurement</td><td>기업이 원자재, 부품, 서비스를 외부에서 사들이는 기능 전반을 말한다. 공급업체 선정, 협상, 계약, 비용 절감을 포함한다. 커니는 이 분야 컨설팅에 강한 회사로 알려져 있다.</td></tr>
+      <tr><td><strong>AEP</strong></td><td>Assessment of Excellence in Procurement</td><td>커니가 오래 이어 온 글로벌 구매·조달 조사 연구다. 여러 기업의 구매 조직 성숙도와 모범 사례를 비교·분석한다.</td></tr>
+      <tr><td><strong>구매 체스보드</strong></td><td>Purchasing Chessboard</td><td>커니 컨설턴트들이 고안한 구매 전략 도구다. 공급 시장의 힘과 수요 측 협상력에 따라 쓸 수 있는 조달 전략을 체스판 모양의 칸으로 정리했다.</td></tr>
+      <tr><td><strong>케이스 인터뷰</strong></td><td>Case Interview</td><td>컨설팅사 채용 면접의 대표 형식이다. 지원자가 실제 사업 문제와 비슷한 사례를 받아 구조화, 가설 설정, 계산, 결론 제시 과정을 면접관 앞에서 풀어 보인다.</td></tr>
+      <tr><td><strong>프로젝트(인게이지먼트)</strong></td><td>Engagement</td><td>컨설팅사가 고객사와 계약을 맺고 수행하는 프로젝트 단위를 말한다. 보통 몇 주에서 몇 달 동안 정해진 범위와 목표에 따라 진행한다.</td></tr>
+      <tr><td><strong>파트너</strong></td><td>Partner</td><td>컨설팅사의 최상위 직급으로 회사 지분을 가진 공동 소유자인 경우가 많다. 고객 관계를 관리하고 수주와 프로젝트 품질을 최종 책임진다. 커니는 파트너들이 소유한 회사다.</td></tr>
+      <tr><td><strong>프린시펄</strong></td><td>Principal</td><td>파트너 바로 아래 직급으로 여러 프로젝트를 동시에 관리하며 파트너 승진을 앞둔 단계다. 회사마다 이름이 달라 '어소시에이트 파트너' 등으로 부르기도 한다.</td></tr>
+      <tr><td><strong>글로벌 도시 지수</strong></td><td>Global Cities Index (GCI)</td><td>커니가 2008년부터 발표하는 세계 도시 경쟁력 보고서다. 기업 활동, 인적 자본, 정보 교류, 문화 경험, 정치 참여 등 여러 차원으로 세계 주요 도시를 평가한다. 함께 발표되는 '글로벌 도시 전망(Global Cities Outlook)'은 도시의 미래 잠재력을 본다.</td></tr>
+      <tr><td><strong>FDI 신뢰 지수</strong></td><td>FDI Confidence Index</td><td>커니가 1998년부터 내는 해외직접투자(FDI) 전망 지수다. 세계 대기업 경영진 설문을 바탕으로 향후 몇 년간 투자처로 매력적인 국가 순위를 매긴다.</td></tr>
+      <tr><td><strong>실사</strong></td><td>Due Diligence</td><td>인수합병(M&amp;A)이나 투자 전에 대상 기업의 사업, 재무, 시장, 운영 상태를 조사·검증하는 일이다. 컨설팅사는 주로 시장과 사업성을 보는 '상업 실사(commercial due diligence)'를 맡는다.</td></tr>
+      <tr><td><strong>운영 컨설팅</strong></td><td>Operations Consulting</td><td>생산, 공급망, 물류, 구매처럼 기업이 실제로 돌아가는 방식을 개선하는 컨설팅이다. 커니는 전략과 함께 운영 실행 역량을 강점으로 내세운다.</td></tr>
+      <tr><td><strong>트랜스포메이션</strong></td><td>Transformation</td><td>비용 구조, 조직, 사업 모델, 디지털 역량 등 기업 전반을 크게 바꾸는 장기 변화 프로그램이다. 단일 과제보다 범위가 넓고 기간이 길다.</td></tr>
+      <tr><td><strong>공급망</strong></td><td>Supply Chain</td><td>원자재 조달부터 생산, 유통, 고객 인도까지 이어지는 흐름 전체를 말한다. 지정학적 위험과 리쇼어링(reshoring)이 화제가 되면서 컨설팅 수요가 커진 분야다.</td></tr>
+      <tr><td><strong>리쇼어링 지수</strong></td><td>Reshoring Index</td><td>커니가 발표하는 미국 제조업 회귀 지표다. 미국 국내 제조업 생산과 아시아 저비용 국가로부터의 제조품 수입을 비교해 미국 제조업의 국내 회귀 흐름을 보여 준다.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>자주 묻는 질문</h3>
+  <details class="faq">
+    <summary>A.T. 커니와 커니는 같은 회사인가?</summary>
+    <p>그렇다. 오랫동안 'A.T. Kearney'라는 이름을 썼으나 2020년 1월 브랜드를 정비하면서 창업자 이름의 머리글자 'A.T.'를 빼고 'Kearney'로 바꾸었다. 법인과 사업의 연속성은 그대로이며, 한국어로는 '에이티커니'와 '커니'가 함께 쓰인다. 자세한 경위는 <a href="#history">역사</a> 항목을 참고한다.</p>
+  </details>
+  <details class="faq">
+    <summary>맥킨지와는 어떤 관계인가?</summary>
+    <p>두 회사는 뿌리가 같다. 앤드루 토머스 커니는 시카고에서 제임스 O. 맥킨지의 회사에 합류했고, 맥킨지가 1937년 세상을 떠난 뒤 1939년 회사가 나뉘었다. 커니가 이끈 시카고 쪽 조직이 훗날 A.T. 커니가 되었고, 마빈 바우어가 이끈 뉴욕 쪽 조직이 오늘날의 맥킨지앤드컴퍼니로 이어졌다. 현재 두 회사는 지분 관계가 없는 독립된 경쟁사다.</p>
+  </details>
+  <details class="faq">
+    <summary>본사는 어디에 있는가?</summary>
+    <p>미국 일리노이주 시카고에 본사가 있다. 창업 초기부터 시카고를 거점으로 삼아 왔으며, 지금은 세계 여러 나라에 사무소를 두고 있다.</p>
+  </details>
+  <details class="faq">
+    <summary>상장 회사인가?</summary>
+    <p>아니다. 커니는 1995년 미국 IT 서비스 기업 EDS에 인수되었다가, 2006년 경영진과 파트너들이 지분을 되사는 경영자 인수(MBO)로 독립했다. 이후 파트너들이 소유한 비상장 회사로 운영되고 있다.</p>
+  </details>
+  <details class="faq">
+    <summary>한국에도 사무소가 있는가?</summary>
+    <p>있다. 서울에 사무소를 두고 국내 대기업과 공공기관 등을 대상으로 전략, 구매·조달, 운영 컨설팅을 한다. 한국 사업에 대한 내용은 <a href="#korea">한국 사무소</a> 항목에서 다룬다.</p>
+  </details>
+  <details class="faq">
+    <summary>'Kearney'와 'Kearny'는 어떻게 다른가?</summary>
+    <p>발음은 거의 같지만 철자가 다르다. 컨설팅사와 네브래스카주 커니 시는 'Kearney'로, 스티븐 W. 커니 장군과 뉴저지주 커니 시는 'Kearny'로 쓴다. 같은 이름의 지명과 인물은 <a href="#other-meanings">다른 뜻 / 동음이의</a> 항목에 정리되어 있다.</p>
+  </details>
+</section>
+
+      <div class="empty" id="empty">검색 결과가 없습니다.</div>
+    </main>
+  </div>
+  <div class="footer">여러 작성 에이전트가 쓰고 팩트체크 에이전트가 검토한 문서입니다. 수치와 연도는 공개 자료 기준이며, 최신 정보는 Kearney 공식 자료에서 확인하세요.</div>
+</div>
+
+<nav class="dock" id="dock"></nav>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const arts=$$('.article'), side=$('#side'), dock=$('#dock');
+  // 섹션 간 교차 링크 문구를 대상 섹션 제목으로 통일
+  $$('.article a[href^="#"]').forEach(l=>{ const t=document.getElementById(l.getAttribute('href').slice(1)); if(t&&t.dataset.title) l.textContent=t.dataset.title; });
+  arts.forEach(a=>{
+    const t=a.dataset.title||a.querySelector('h2').textContent, ico=a.dataset.icon||'📄';
+    const h2=a.querySelector('h2'); if(h2&&!h2.querySelector('.ico')) h2.insertAdjacentHTML('afterbegin','<span class="ico">'+ico+'</span>');
+    side.insertAdjacentHTML('beforeend',`<a href="#${a.id}" data-id="${a.id}"><span>${ico}</span><span>${t}</span><span class="count" data-c="${a.id}"></span></a>`);
+    dock.insertAdjacentHTML('beforeend',`<a href="#${a.id}" data-tip="${t}">${ico}</a>`);
+    a._orig=a.innerHTML;
+  });
+  const words=$('#content').innerText.replace(/\s+/g,'').length;
+  $('#stats').innerHTML=`<span>항목 ${arts.length}개</span><span>약 ${Math.round(words/100)*100}자</span><span>연표 ${$$('.tl-item').length}건</span><span>용어·카드 ${$$('.card').length + $$('.aqua-table tbody tr').length}개</span>`;
+
+  // scroll spy + progress
+  const links=$$('.sidebar a');
+  const onScroll=()=>{
+    const h=document.documentElement; $('#bar').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100||0)+'%';
+    const vis=arts.filter(a=>!a.classList.contains('hidden'));
+    let cur=vis[0]; vis.forEach(a=>{ if(a.getBoundingClientRect().top<140) cur=a; });
+    links.forEach(l=>{ l.classList.toggle('active', !!cur && l.dataset.id===cur.id); l.style.opacity=document.getElementById(l.dataset.id).classList.contains('hidden')?.45:1; });
+  };
+  addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  // search with highlight
+  const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  function highlight(node,re){
+    if(node.nodeType===3){ const m=node.data.match(re); if(!m) return 0;
+      const span=document.createElement('span'); span.innerHTML=node.data.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).replace(re,'<mark>$&</mark>'); node.replaceWith(span); return m.length; }
+    if(node.nodeType===1 && !/^(SCRIPT|STYLE|MARK)$/.test(node.tagName)){ let n=0; [...node.childNodes].forEach(c=>n+=highlight(c,re)); return n; }
+    return 0;
+  }
+  let timer;
+  $('#q').addEventListener('input',e=>{ clearTimeout(timer); timer=setTimeout(()=>{
+    const q=e.target.value.trim(); let any=false;
+    arts.forEach(a=>{ a.innerHTML=a._orig; const c=$(`[data-c="${a.id}"]`);
+      if(!q){ a.classList.remove('hidden'); c.textContent=''; any=true; return; }
+      const n=highlight(a,new RegExp(esc(q),'gi'));
+      a.classList.toggle('hidden',!n); c.textContent=n||''; if(n){ any=true; a.querySelectorAll('details').forEach(d=>{ if(d.querySelector('mark')) d.open=true; }); }
+    });
+    $('#empty').style.display=any?'none':'block'; onScroll();
+  },180); });
+
+  // toolbar actions
+  $('#btnTop').onclick=()=>scrollTo({top:0});
+  $('#btnSide').onclick=()=>{ const w=$('#win'); matchMedia('(max-width:860px)').matches ? w.classList.toggle('show-side') : w.classList.toggle('no-side'); };
+  side.addEventListener('click',()=>$('#win').classList.remove('show-side'));
+  const root=document.documentElement;
+  try{ if(localStorage.getItem('kearney-theme')==='graphite') root.dataset.theme='graphite'; }catch(e){}
+  $('#btnTheme').onclick=()=>{ const g=root.dataset.theme==='graphite'; root.dataset.theme=g?'':'graphite'; try{localStorage.setItem('kearney-theme',g?'aqua':'graphite')}catch(e){} };
+  let open=false; $('#btnExpand').onclick=e=>{ open=!open; $$('details.faq').forEach(d=>d.open=open); e.target.textContent=open?'FAQ 모두 접기':'FAQ 모두 펼치기'; };
+  $('#btnRandom').onclick=()=>{ const v=arts.filter(a=>!a.classList.contains('hidden')); v[Math.floor(Math.random()*v.length)]?.scrollIntoView(); };
+  const tick=()=>{ const d=new Date(); $('#clock').textContent=d.toLocaleString('ko-KR',{weekday:'short',hour:'2-digit',minute:'2-digit'}); };
+  tick(); setInterval(tick,30000);
+  if(location.hash) setTimeout(()=>{ try{ document.querySelector(decodeURIComponent(location.hash))?.scrollIntoView(); }catch(e){} },60);
+})();
+</script>
+</body>
+</html>
